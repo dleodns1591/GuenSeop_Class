@@ -24,12 +24,13 @@ class Stretegy
             case EPlayerAIType.Berserker:
                 thisAI = new Berserker_1();
                 break;
+            case EPlayerAIType.HeavyCavalry:
+                thisAI = new HeavyCavalry_1();
+                break;
+            case EPlayerAIType.SwordMan:
+                thisAI = new SwordMan_1();
+                break;
         }
-    }
-
-    public void Move()
-    {
-        thisAI.Move();
     }
 
     public void Attack()
@@ -40,7 +41,6 @@ class Stretegy
 
 public abstract class AI
 {
-    public abstract void Move();
     public abstract void Attack();
 }
 
@@ -51,10 +51,6 @@ public class Archer_1 : AI
         Debug.Log("Attack_1");
     }
 
-    public override void Move()
-    {
-        Debug.Log("Move_1");
-    }
 }
 
 public class Berserker_1 : AI
@@ -63,10 +59,20 @@ public class Berserker_1 : AI
     {
         Debug.Log("Attack_2");
     }
+}
 
-    public override void Move()
+public class HeavyCavalry_1 : AI
+{
+    public override void Attack()
     {
-        Debug.Log("Move_2");
+
     }
 }
 
+public class SwordMan_1 : AI
+{
+    public override void Attack()
+    {
+
+    }
+}

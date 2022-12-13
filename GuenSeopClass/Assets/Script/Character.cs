@@ -7,7 +7,6 @@ public class Character : MonoBehaviour
     public enum EState
     {
         None,
-        Move,
         Attack
     }
 
@@ -27,15 +26,6 @@ public class Character : MonoBehaviour
 
     public void Start()
     {
-    }
-
-    public void Update()
-    {
-        PlayerAI();
-    }
-
-    public void PlayerAI()
-    {
         switch (ePlayerAI)
         {
             case EPlayerAI.Archer:
@@ -54,13 +44,13 @@ public class Character : MonoBehaviour
                 stretegy.StretegyInit(EPlayerAIType.SwordMan);
                 break;
         }
+    }
 
+    public void Update()
+    {
         switch (eState)
         {
             case EState.None:
-                break;
-            case EState.Move:
-                stretegy.Move();
                 break;
             case EState.Attack:
                 stretegy.Attack();
