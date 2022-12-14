@@ -2,48 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Character : MonoBehaviour
+public class Character : Data
 {
-    public enum EState
-    {
-        None,
-        Attack
-    }
-
-    public enum EPlayerAI
-    {
-        Archer,
-        Berserker,
-        HeavyCavalry,
-        SwordMan,
-    }
-
-    public EPlayerAI ePlayerAI;
+    public EPlayerAIType ePlayerAI;
     public EState eState;
 
-    Stretegy stretegy = new Stretegy();
-
+    Stretegy stretegy;
 
     public void Start()
     {
-        switch (ePlayerAI)
-        {
-            case EPlayerAI.Archer:
-                stretegy.StretegyInit(EPlayerAIType.Archer);
-                break;
+        stretegy = new Stretegy(this);
 
-            case EPlayerAI.Berserker:
-                stretegy.StretegyInit(EPlayerAIType.Berserker);
-                break;
-
-            case EPlayerAI.HeavyCavalry:
-                stretegy.StretegyInit(EPlayerAIType.HeavyCavalry);
-                break;
-
-            case EPlayerAI.SwordMan:
-                stretegy.StretegyInit(EPlayerAIType.SwordMan);
-                break;
-        }
+        stretegy.StretegyInit(ePlayerAI);
     }
 
     public void Update()
@@ -51,6 +21,9 @@ public class Character : MonoBehaviour
         switch (eState)
         {
             case EState.None:
+                break;
+            case EState.Move:
+                stretegy.Move();
                 break;
             case EState.Attack:
                 stretegy.Attack();
