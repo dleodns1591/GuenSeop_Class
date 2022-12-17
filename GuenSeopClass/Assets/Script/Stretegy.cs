@@ -21,14 +21,10 @@ public enum EState
 class Stretegy
 {
     AI thisAI;
-
     Character context;
-    public Transform target = null;
+    public Transform targetPos;
 
-    public Stretegy(Character _context)
-    {
-        context = _context;
-    }
+    public Stretegy(Character _context) => context = _context;
 
     public void StretegyInit(EAIType type)
     {
@@ -51,24 +47,36 @@ class Stretegy
 
     public void Attack()
     {
-        thisAI.Attack();
+        if (targetPos != null)
+            thisAI.Attack();
+        else
+            context.eState = EState.Move;
     }
 
     public void Move()
     {
-        thisAI.Move();
+        if (targetPos == null)
+        {
+            thisAI.Move();
+            context.ViewDistance();
+        }
+        else
+        {
+            thisAI.target = targetPos;
+            context.eState = EState.Attack;
+        }
     }
 }
 
 public abstract class AI
 {
-    public Transform target;
-
-    public Vector3 movePos = Vector3.zero;
+    protected Vector3 movePos = Vector3.zero;
+    protected Vector3 currentPos = Vector3.zero;
 
     protected Character context;
     protected GameObject gameObject;
     protected Transform transform;
+    public Transform target = null;
 
     public abstract void Attack();
     public abstract void Move();
@@ -80,47 +88,16 @@ public class ArcherAI : AI
 {
     public ArcherAI(Character _context)
     {
-        context = _context;
-        gameObject = _context.gameObject;
-        transform = _context.transform;
+
     }
 
     public override void Attack()
     {
-        Debug.Log("공격");
     }
 
     public override void Move()
     {
 
-        if (target == null)
-        {
-            if (transform.position == movePos || movePos == Vector3.zero)
-            {
-                Debug.Log(target);
-                var screenScaleHeight = Screen.height;
-                var screenScaleWidth = Screen.width;
-
-                var targetRangeX = Random.Range(0, screenScaleWidth);
-                var targetRangeY = Random.Range(0, screenScaleHeight);
-
-                var randPosition = Camera.main.ScreenToWorldPoint(new Vector2(targetRangeX, targetRangeY));
-                movePos = randPosition + new Vector3(0, 0, 10);
-            }
-        }
-        else
-        {
-            context.eState = EState.Attack;
-        }
-
-        transform.position = Vector3.MoveTowards(transform.position, movePos, 3 * Time.deltaTime);
-    }
-
-
-
-    private Coroutine StartCoroutine(IEnumerator routine)
-    {
-        return context.StartCoroutine(routine);
     }
 }
 
@@ -135,17 +112,15 @@ public class BerserkerAI : AI
 
     public override void Attack()
     {
-        Debug.Log("공격");
+        transform.DOMove(target.position, 0.5f);
     }
 
     public override void Move()
     {
-
         if (target == null)
         {
             if (transform.position == movePos || movePos == Vector3.zero)
             {
-                Debug.Log(target);
                 var screenScaleHeight = Screen.height;
                 var screenScaleWidth = Screen.width;
 
@@ -155,10 +130,6 @@ public class BerserkerAI : AI
                 var randPosition = Camera.main.ScreenToWorldPoint(new Vector2(targetRangeX, targetRangeY));
                 movePos = randPosition + new Vector3(0, 0, 10);
             }
-        }
-        else
-        {
-            context.eState = EState.Attack;
         }
 
         transform.position = Vector3.MoveTowards(transform.position, movePos, 3 * Time.deltaTime);

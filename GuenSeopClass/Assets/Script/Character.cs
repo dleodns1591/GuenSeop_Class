@@ -22,38 +22,30 @@ public class Character : MonoBehaviour
             case EState.None:
                 break;
             case EState.Move:
-                if (stretegy.target == null)
-                {
-                    stretegy.Move();
-                    AttackDistance();
-                }
+                stretegy.Move();
                 break;
             case EState.Attack:
-                if (stretegy.target != null)
-                    stretegy.Attack();
-                else
-                    eState = EState.Move;
+                stretegy.Attack();
                 break;
         }
     }
 
-    // 공격거리 체크해주는 함수
-    void AttackDistance()
+    public void ViewDistance()
     {
-        Collider2D[] collider = Physics2D.OverlapCircleAll(transform.position, 4);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 5);
 
-        foreach (Collider2D colliders in collider)
+        foreach (Collider2D collider in colliders)
         {
-            var check = colliders.GetComponent<Scarecrow>();
+            var check = collider.GetComponent<Scarecrow>();
             if (check != null)
-                stretegy.target = colliders.transform;
+                stretegy.targetPos = collider.transform;
         }
     }
 
-    // 기즈모 그려주는 함수
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, 4);
+        Gizmos.DrawWireSphere(transform.position, 5);
     }
 }
