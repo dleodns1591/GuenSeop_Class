@@ -86,8 +86,6 @@ public abstract class AI
     public abstract void Move();
 }
 
-
-
 public class ArcherAI : AI
 {
     public ArcherAI(Character _context)
@@ -117,32 +115,33 @@ public class BerserkerAI : AI
 
     public override void Attack()
     {
-        if (isAtkCheck == false)
-            StartCoroutine(AI_Attack());
+        StartCoroutine(AI_Attack());
     }
 
     private IEnumerator AI_Attack()
     {
-        isAtkCheck = true;
-        currentPos = transform.position;
-        animator.SetInteger("BerSerKer", 2);
-
-        transform.DOMove(new Vector2(target.position.x + 2, target.position.y), 0.5f);
-
-        yield return new WaitForSeconds(0.2f);
-
-        Camera.main.DOShakePosition(0.5f, 0.5f);
-
-        yield return new WaitForSeconds(1);
-
-        transform.DOKill();
-        Camera.main.DOShakePosition(0, 0);
-        animator.SetInteger("BerSerKer", 1);
-        transform.DOMove(currentPos, 2).SetEase(Ease.Linear).OnComplete(() =>
+        if (isAtkCheck == false)
         {
-            isAtkCheck = false;
-        });
+            isAtkCheck = true;
+            currentPos = transform.position;
+            animator.SetInteger("BerSerKer", 2);
 
+            transform.DOMove(new Vector2(target.position.x + 2, target.position.y), 0.5f);
+
+            yield return new WaitForSeconds(0.2f);
+
+            Camera.main.DOShakePosition(0.5f, 0.5f);
+
+            yield return new WaitForSeconds(1);
+
+            transform.DOKill();
+            Camera.main.DOShakePosition(0, 0);
+            animator.SetInteger("BerSerKer", 1);
+            transform.DOMove(currentPos, 2).SetEase(Ease.Linear).OnComplete(() =>
+            {
+                isAtkCheck = false;
+            });
+        }
     }
 
     public override void Move()
@@ -152,7 +151,7 @@ public class BerserkerAI : AI
 
         if (target == null)
         {
-            if (transform.position == movePos || movePos == Vector3.zero)
+            if (transform.position == movePos)
             {
                 var screenScaleHeight = Screen.height;
                 var screenScaleWidth = Screen.width;

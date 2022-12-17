@@ -42,7 +42,6 @@ public class Character : MonoBehaviour
         }
     }
 
-
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
