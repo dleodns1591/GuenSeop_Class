@@ -70,6 +70,8 @@ class Stretegy
 
 public abstract class AI
 {
+    protected bool isAtkCheck = false;
+
     protected Vector3 movePos = Vector3.zero;
     protected Vector3 currentPos = Vector3.zero;
 
@@ -77,6 +79,8 @@ public abstract class AI
     protected GameObject gameObject;
     protected Transform transform;
     public Transform target = null;
+
+    public Animator animator = null;
 
     public abstract void Attack();
     public abstract void Move();
@@ -108,15 +112,44 @@ public class BerserkerAI : AI
         context = _context;
         gameObject = _context.gameObject;
         transform = _context.transform;
+        animator = _context.GetComponent<Animator>();
     }
 
     public override void Attack()
     {
-        transform.DOMove(target.position, 0.5f);
+        if (isAtkCheck == false)
+            StartCoroutine(AI_Attack());
+    }
+
+    private IEnumerator AI_Attack()
+    {
+        isAtkCheck = true;
+        currentPos = transform.position;
+        animator.SetInteger("BerSerKer", 2);
+
+        transform.DOMove(new Vector2(target.position.x + 2, target.position.y), 0.5f);
+
+        yield return new WaitForSeconds(0.2f);
+
+        Camera.main.DOShakePosition(0.5f, 0.5f);
+
+        yield return new WaitForSeconds(1);
+
+        transform.DOKill();
+        Camera.main.DOShakePosition(0, 0);
+        animator.SetInteger("BerSerKer", 1);
+        transform.DOMove(currentPos, 2).SetEase(Ease.Linear).OnComplete(() =>
+        {
+            isAtkCheck = false;
+        });
+
     }
 
     public override void Move()
     {
+        animator.SetInteger("BerSerKer", 1);
+        animator.SetBool("Start", true);
+
         if (target == null)
         {
             if (transform.position == movePos || movePos == Vector3.zero)
