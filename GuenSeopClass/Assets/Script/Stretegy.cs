@@ -1,9 +1,9 @@
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public enum EPlayerAIType
+public enum EAIType
 {
     Archer,
     Berserker,
@@ -11,31 +11,40 @@ public enum EPlayerAIType
     SwordMan,
 }
 
+public enum EState
+{
+    None,
+    Move,
+    Attack
+}
+
 class Stretegy
 {
     AI thisAI;
 
     Character context;
+    public Transform target = null;
+
     public Stretegy(Character _context)
     {
         context = _context;
     }
 
-    public void StretegyInit(EPlayerAIType type)
+    public void StretegyInit(EAIType type)
     {
         switch (type)
         {
-            case EPlayerAIType.Archer:
-                thisAI = new Archer_1(context);
+            case EAIType.Archer:
+                thisAI = new ArcherAI(context);
                 break;
-            case EPlayerAIType.Berserker:
-                thisAI = new Berserker_1(context);
+            case EAIType.Berserker:
+                thisAI = new BerserkerAI(context);
                 break;
-            case EPlayerAIType.HeavyCavalry:
-                thisAI = new HeavyCavalry_1(context);
+            case EAIType.HeavyCavalry:
+                thisAI = new HeavyCavalryAI(context);
                 break;
-            case EPlayerAIType.SwordMan:
-                thisAI = new SwordMan_1(context);
+            case EAIType.SwordMan:
+                thisAI = new SwordManAI(context);
                 break;
         }
     }
@@ -53,135 +62,117 @@ class Stretegy
 
 public abstract class AI
 {
+    public Transform target;
+
+    public Vector3 movePos = Vector3.zero;
+
     protected Character context;
     protected GameObject gameObject;
     protected Transform transform;
 
-    protected float attackRange = 10;
-    protected float moveSpeed = 1;
-
-    protected Scarecrow targeted;
-
-    public AI(Character _context)
-    {
-        context = _context;
-
-        gameObject = context.gameObject;
-        transform = context.transform;
-    }
-
     public abstract void Attack();
     public abstract void Move();
-
-    public virtual void MoveToTarget()
-    {
-        if (NeedMoveToTargetX(targeted.transform))
-        {
-            int dir = 0;
-
-            float transX = transform.position.x;
-            float targetX = targeted.transform.position.x;
-            if (transX < targetX && targetX - transX > attackRange)
-            {
-                dir = 1;
-            }
-            else if (transX > targetX && transX - targetX < attackRange)
-            {
-                dir = 1;
-            }
-            else if (transX > targetX && transX - targetX > attackRange)
-            {
-                dir = -1;
-            }
-            else if (transX < targetX && targetX - transX < attackRange)
-            {
-                dir = -1;
-            }
-
-            transform.Translate(Vector3.right * dir * moveSpeed * Time.deltaTime);
-        }
-
-        if (NeedMoveToTargetY(targeted.transform))
-        {
-            int dir = transform.position.y < targeted.transform.position.y ? 1 : -1;
-
-            transform.Translate(Vector3.up * dir * moveSpeed * Time.deltaTime);
-        }
-    }
-    public virtual bool IsArriveAtTarget()
-    {
-        return !NeedMoveToTargetX(targeted.transform) && !NeedMoveToTargetY(targeted.transform);
-    }
-    public virtual bool NeedMoveToTargetX(Transform target)
-    {
-        bool result = false;
-
-        if (Mathf.Abs(Mathf.Abs(target.position.x - transform.position.x) - attackRange) > 0.1f)
-        {
-            result = true;
-        }
-        if (Mathf.Abs(target.position.x - transform.position.x) > attackRange)
-        {
-            result = true;
-        }
-
-        return result;
-    }
-    public virtual bool NeedMoveToTargetY(Transform target)
-    {
-        bool result = false;
-
-        if (Mathf.Abs(transform.position.y - target.position.y) > 0.1f)
-        {
-            result = true;
-        }
-
-        return result;
-    }
 }
 
 
 
-public class Archer_1 : AI
+public class ArcherAI : AI
 {
-    public Archer_1(Character context) : base(context)
+    public ArcherAI(Character _context)
     {
-
+        context = _context;
+        gameObject = _context.gameObject;
+        transform = _context.transform;
     }
 
     public override void Attack()
     {
-        Debug.Log("Attack_1");
-    }
-
-    public override void Move()
-    {
-        MoveToTarget();
-    }
-}
-
-public class Berserker_1 : AI
-{
-    public Berserker_1(Character context) : base(context)
-    {
-
-    }
-
-    public override void Attack()
-    {
-        Debug.Log("Attack_2");
+        Debug.Log("공격");
     }
 
     public override void Move()
     {
 
+        if (target == null)
+        {
+            if (transform.position == movePos || movePos == Vector3.zero)
+            {
+                Debug.Log(target);
+                var screenScaleHeight = Screen.height;
+                var screenScaleWidth = Screen.width;
+
+                var targetRangeX = Random.Range(0, screenScaleWidth);
+                var targetRangeY = Random.Range(0, screenScaleHeight);
+
+                var randPosition = Camera.main.ScreenToWorldPoint(new Vector2(targetRangeX, targetRangeY));
+                movePos = randPosition + new Vector3(0, 0, 10);
+            }
+        }
+        else
+        {
+            context.eState = EState.Attack;
+        }
+
+        transform.position = Vector3.MoveTowards(transform.position, movePos, 3 * Time.deltaTime);
     }
 
+
+
+    private Coroutine StartCoroutine(IEnumerator routine)
+    {
+        return context.StartCoroutine(routine);
+    }
 }
 
-public class HeavyCavalry_1 : AI
+public class BerserkerAI : AI
 {
-    public HeavyCavalry_1(Character context) : base(context)
+    public BerserkerAI(Character _context)
+    {
+        context = _context;
+        gameObject = _context.gameObject;
+        transform = _context.transform;
+    }
+
+    public override void Attack()
+    {
+        Debug.Log("공격");
+    }
+
+    public override void Move()
+    {
+
+        if (target == null)
+        {
+            if (transform.position == movePos || movePos == Vector3.zero)
+            {
+                Debug.Log(target);
+                var screenScaleHeight = Screen.height;
+                var screenScaleWidth = Screen.width;
+
+                var targetRangeX = Random.Range(0, screenScaleWidth);
+                var targetRangeY = Random.Range(0, screenScaleHeight);
+
+                var randPosition = Camera.main.ScreenToWorldPoint(new Vector2(targetRangeX, targetRangeY));
+                movePos = randPosition + new Vector3(0, 0, 10);
+            }
+        }
+        else
+        {
+            context.eState = EState.Attack;
+        }
+
+        transform.position = Vector3.MoveTowards(transform.position, movePos, 3 * Time.deltaTime);
+    }
+
+    private Coroutine StartCoroutine(IEnumerator routine)
+    {
+        return context.StartCoroutine(routine);
+    }
+}
+
+public class HeavyCavalryAI : AI
+{
+    public HeavyCavalryAI(Character context)
     {
     }
 
@@ -196,9 +187,9 @@ public class HeavyCavalry_1 : AI
     }
 }
 
-public class SwordMan_1 : AI
+public class SwordManAI : AI
 {
-    public SwordMan_1(Character context) : base(context)
+    public SwordManAI(Character context)
     {
     }
 

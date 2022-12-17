@@ -99,8 +99,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8808e6129754aeb4cb6e73ff7f2bc285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ePlayerAI: 0
-  eState: 0
+  eAIType: 0
+  eState: 1
 --- !u!61 &8267318811345216346
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -125,7 +125,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 8.4, y: 9.4}
+  m_Size: {x: 10, y: 10}
   m_EdgeRadius: 0
 --- !u!50 &8594307504908672780
 Rigidbody2D:
