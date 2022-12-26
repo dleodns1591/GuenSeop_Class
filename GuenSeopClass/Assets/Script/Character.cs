@@ -11,6 +11,9 @@ public class Character : MonoBehaviour
 
     public void Start()
     {
+        Debug.Log("asdfasdfasdf");
+        Debug.Log("asdfasdfasdf");
+        Debug.Log("asdfasdfasdf");
         stretegy = new Stretegy(this);
         stretegy.StretegyInit(eAIType);
     }
