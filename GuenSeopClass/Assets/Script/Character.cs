@@ -37,6 +37,7 @@ public class Character : MonoBehaviour
         foreach (Collider2D collider in colliders)
         {
             var check = collider.GetComponent<Scarecrow>();
+
             if (check != null)
                 stretegy.targetPos = collider.transform;
         }
